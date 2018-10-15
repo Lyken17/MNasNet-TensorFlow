@@ -69,6 +69,8 @@ __MNAS_DEF = dict(
 		op(slim.conv2d, stride=1, kernel_size=[1, 1], num_outputs=1280)
 	],
 )
+
+import shutil
 if __name__ == '__main__':
 	resolution = 224
 	num_filters = 3
@@ -76,9 +78,11 @@ if __name__ == '__main__':
 
 	import os, os.path as osp
 
+	from tf_models.mobilenet_v2 import mobilenetv2, mobilenet_v2_140
 	with tf.Graph().as_default():
 		data = tf.placeholder(tf.float32, shape=dsize, name="input")
-		net, end_points = mnasnet(data, num_classes=1000, conv_defs=__MNAS_DEF, scope=None, depth_multiplier=1.0)
+		net, end_points = mnasnet(data, num_classes=1000, scope=None, depth_multiplier=1.0)
+		# net = mobilenet_v2_140(data, num_classes=1000, scope=None)
 
 		target = "tmp"
 		os.makedirs(target, exist_ok=True)
@@ -87,9 +91,12 @@ if __name__ == '__main__':
 			writer = tf.summary.FileWriter(target, sess.graph)
 			sess.run(tf.global_variables_initializer())
 			writer.close()
-
+			print("Computation graph dumped.")
 			# net = tf.graph_util.remove_training_nodes(net)
 			converter = tf.contrib.lite.TocoConverter.from_session(sess, [data], [net])
 			tflite_model = converter.convert()
 			model_file = osp.join(target, "model.tflite")
+			if osp.exists(model_file):
+				os.remove(model_file)
 			open(model_file, "wb").write(tflite_model)
+			print("TF-Lite generated.")

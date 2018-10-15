@@ -182,10 +182,9 @@ if __name__ == '__main__':
 	dsize = (1, resolution, resolution, num_filters)
 
 	import os, os.path as osp
-
 	with tf.Graph().as_default():
 		data = tf.placeholder(tf.float32, shape=dsize, name="input")
-		net, end_points = mnasnet(data, num_classes=1000, conv_defs=__MNAS_DEF, scope=None, depth_multiplier=1.0)
+		net, end_points = mnasnet(data, num_classes=1000, conv_defs=__MNAS_DEF, scope=None, depth_multiplier=1.4)
 
 		target= "temp"
 		with tf.Session() as sess:

@@ -86,8 +86,8 @@ V2_DEF = dict(
 
 
 @slim.add_arg_scope
-def mobilenet(input_tensor, num_classes=1001, depth_multiplier=1.0, scope='MobilenetV2', conv_defs=None,
-              finegrain_classification_mode=False, min_depth=None, divisible_by=None, **kwargs):
+def mobilenetv2(input_tensor, num_classes=1001, depth_multiplier=1.0, scope='MobilenetV2', conv_defs=None,
+                finegrain_classification_mode=False, min_depth=None, divisible_by=None, **kwargs):
 	"""Creates mobilenet V2 network.
 
 	Inference mode is created by default. To create training use training_scope
@@ -155,38 +155,20 @@ def wrapped_partial(func, *args, **kwargs):
 # Wrappers for mobilenet v2 with depth-multipliers. Be noticed that
 # 'finegrain_classification_mode' is set to True, which means the embedding
 # layer will not be shrinked when given a depth-multiplier < 1.0.
-mobilenet_v2_140 = wrapped_partial(mobilenet, depth_multiplier=1.4)
-mobilenet_v2_050 = wrapped_partial(mobilenet, depth_multiplier=0.50, finegrain_classification_mode=True)
-mobilenet_v2_035 = wrapped_partial(mobilenet, depth_multiplier=0.35, finegrain_classification_mode=True)
+mobilenet_v2_100 = wrapped_partial(mobilenetv2, depth_multiplier=1.0)
+mobilenet_v2_140 = wrapped_partial(mobilenetv2, depth_multiplier=1.4)
+mobilenet_v2_050 = wrapped_partial(mobilenetv2, depth_multiplier=0.50, finegrain_classification_mode=True)
+mobilenet_v2_035 = wrapped_partial(mobilenetv2, depth_multiplier=0.35, finegrain_classification_mode=True)
 
 
 @slim.add_arg_scope
 def mobilenet_base(input_tensor, depth_multiplier=1.0, **kwargs):
 	"""Creates base of the mobilenet (no pooling and no logits) ."""
-	return mobilenet(input_tensor, depth_multiplier=depth_multiplier, base_only=True, **kwargs)
+	return mobilenetv2(input_tensor, depth_multiplier=depth_multiplier, base_only=True, **kwargs)
 
 
 def training_scope(**kwargs):
-	"""Defines MobilenetV2 training scope.
-
-	Usage:
-	   with tf.contrib.slim.arg_scope(mobilenet_v2.training_scope()):
-		 logits, endpoints = mobilenet_v2.mobilenet(input_tensor)
-
-	with slim.
-
-	Args:
-	  **kwargs: Passed to mobilenet.training_scope. The following parameters
-	  are supported:
-		weight_decay- The weight decay to use for regularizing the model.
-		stddev-  Standard deviation for initialization, if negative uses xavier.
-		dropout_keep_prob- dropout keep probability
-		bn_decay- decay for the batch norm moving averages.
-
-	Returns:
-	  An `arg_scope` to use for the mobilenet v2 model.
-	"""
 	return lib.training_scope(**kwargs)
 
 
-__all__ = ['training_scope', 'mobilenet_base', 'mobilenet', 'V2_DEF']
+__all__ = ['training_scope', 'mobilenet_base', 'mobilenetv2', 'V2_DEF']
